@@ -42,11 +42,11 @@ class ScoringTest {
         assertEquals(40, s(LARGE_STRAIGHT, 5, 5, 5, 5, 5, joker = true))
     }
 
-    @Test fun yahtzeeAndChance() {
-        assertEquals(50, s(YAHTZEE, 6, 6, 6, 6, 6))
-        assertEquals(0, s(YAHTZEE, 6, 6, 6, 6, 5))
+    @Test fun fiveKindAndChance() {
+        assertEquals(50, s(FIVE_KIND, 6, 6, 6, 6, 6))
+        assertEquals(0, s(FIVE_KIND, 6, 6, 6, 6, 5))
         assertEquals(15, s(CHANCE, 1, 2, 3, 4, 5))
-        assertTrue(Scoring.isYahtzee(listOf(1, 1, 1, 1, 1)))
-        assertFalse(Scoring.isYahtzee(listOf(0, 0, 0, 0, 0)))
+        assertTrue(Scoring.isFiveOfAKind(listOf(1, 1, 1, 1, 1)))
+        assertFalse(Scoring.isFiveOfAKind(listOf(0, 0, 0, 0, 0)))
     }
 }

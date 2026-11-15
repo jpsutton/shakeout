@@ -3,7 +3,7 @@ package io.github.jpsutton.shakeout.game
 /** The 13 boxes of one scorecard column, in card order. */
 enum class Category(val face: Int = 0) {
     ONES(1), TWOS(2), THREES(3), FOURS(4), FIVES(5), SIXES(6),
-    THREE_OF_A_KIND, FOUR_OF_A_KIND, FULL_HOUSE, SMALL_STRAIGHT, LARGE_STRAIGHT, YAHTZEE, CHANCE;
+    THREE_OF_A_KIND, FOUR_OF_A_KIND, FULL_HOUSE, SMALL_STRAIGHT, LARGE_STRAIGHT, FIVE_KIND, CHANCE;
 
     val isUpper: Boolean get() = face != 0
 

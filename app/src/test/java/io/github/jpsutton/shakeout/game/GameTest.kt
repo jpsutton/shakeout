@@ -16,8 +16,8 @@ class GameTest {
         bonus: Int = 0,
     ) = GameState(mode, columns.toList(), bonusPoints = bonus, dice = dice, rollsLeft = 2)
 
-    private val allBut = { open: Set<Category>, yahtzee: Int ->
-        Category.entries.filter { it !in open }.associateWith { if (it == YAHTZEE) yahtzee else 0 }
+    private val allBut = { open: Set<Category>, fiveKindScore: Int ->
+        Category.entries.filter { it !in open }.associateWith { if (it == FIVE_KIND) fiveKindScore else 0 }
     }
 
     @Test fun rollKeepsHeldDiceAndCountsRolls() {
@@ -60,7 +60,7 @@ class GameTest {
         assertEquals(0, Game.upperBonus(g, 0))
     }
 
-    @Test fun standardYahtzeeBonusNeedsFiftyInBox() {
+    @Test fun standardFiveKindBonusNeedsFiftyInBox() {
         val open = setOf(CHANCE, SIXES)
         val dice = List(5) { 6 }
         val withFifty = state(Mode.STANDARD, dice, allBut(open, 50))
@@ -71,10 +71,10 @@ class GameTest {
         assertEquals(0, Game.place(scratched, Placement(0, SIXES)).bonusPoints)
     }
 
-    @Test fun firstYahtzeeIsNotABonus() {
+    @Test fun firstFiveKindIsNotABonus() {
         val g = state(Mode.STANDARD, List(5) { 3 }, emptyMap())
-        val next = Game.place(g, Placement(0, YAHTZEE))
-        assertEquals(50, next.scores[0][YAHTZEE])
+        val next = Game.place(g, Placement(0, FIVE_KIND))
+        assertEquals(50, next.scores[0][FIVE_KIND])
         assertEquals(0, next.bonusPoints)
         assertFalse(Game.isJoker(g))
         assertEquals(13, Game.legalPlacements(g).size)
@@ -102,7 +102,7 @@ class GameTest {
         assertEquals(0, Game.scoreFor(g, Placement(0, TWOS)))
     }
 
-    @Test fun jokerAppliesWithScratchedYahtzeeBoxToo() {
+    @Test fun jokerAppliesWithScratchedFiveKindBoxToo() {
         val open = setOf(SIXES, CHANCE)
         val g = state(Mode.STANDARD, List(5) { 6 }, allBut(open, 0))
         assertTrue(Game.isJoker(g))
@@ -128,10 +128,10 @@ class GameTest {
         assertEquals((63 + 35) * 3, Game.total(g))
     }
 
-    @Test fun tripleJokerNeedsAllThreeYahtzeeBoxesFilled() {
+    @Test fun tripleJokerNeedsAllThreeFiveKindBoxesFilled() {
         val open = setOf(CHANCE, SIXES)
         val dice = List(5) { 6 }
-        val two = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open + YAHTZEE, 0))
+        val two = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open + FIVE_KIND, 0))
         assertFalse(Game.isJoker(two))
         assertEquals(7, Game.legalPlacements(two).size)
         val three = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open, 50))
@@ -149,18 +149,21 @@ class GameTest {
         assertTrue(Game.legalPlacements(g).none { it.category.isUpper })
     }
 
-    @Test fun tripleBonusIsMultipliedByColumn() {
+    @Test fun tripleBonusIsFlatWhateverTheColumn() {
         val open = setOf(CHANCE, SIXES)
         val dice = List(5) { 6 }
         val g = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open, 50))
-        assertEquals(100, Game.place(g, Placement(0, SIXES)).bonusPoints)
-        assertEquals(200, Game.place(g, Placement(1, SIXES)).bonusPoints)
-        val placed = Game.place(g, Placement(2, SIXES))
-        assertEquals(300, placed.bonusPoints)
-        assertEquals(30, placed.scores[2][SIXES])
+        for (column in 0..2) {
+            val placed = Game.place(g, Placement(column, SIXES))
+            assertEquals(100, placed.bonusPoints)
+            assertEquals(30, placed.scores[column][SIXES])
+        }
+        // Each column already holds its 50; columns are multiplied, the bonus is added afterwards.
+        val total = Game.total(Game.place(g, Placement(2, SIXES)))
+        assertEquals(50 * 1 + 50 * 2 + (50 + 30) * 3 + 100, total)
     }
 
-    @Test fun tripleBonusNeedsAllThreeYahtzeeBoxesAtFifty() {
+    @Test fun tripleBonusNeedsAllThreeFiveKindBoxesAtFifty() {
         val open = setOf(CHANCE, SIXES)
         val dice = List(5) { 6 }
         val g = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open, 0))

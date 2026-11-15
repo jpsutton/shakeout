@@ -7,8 +7,8 @@ object Scoring {
     const val FULL_HOUSE = 25
     const val SMALL_STRAIGHT = 30
     const val LARGE_STRAIGHT = 40
-    const val YAHTZEE = 50
-    const val YAHTZEE_BONUS = 100
+    const val FIVE_KIND = 50
+    const val FIVE_KIND_BONUS = 100
 
     fun counts(dice: List<Int>): IntArray {
         val counts = IntArray(7)
@@ -16,10 +16,10 @@ object Scoring {
         return counts
     }
 
-    fun isYahtzee(dice: List<Int>): Boolean = dice.size == 5 && dice.all { it == dice[0] } && dice[0] in 1..6
+    fun isFiveOfAKind(dice: List<Int>): Boolean = dice.size == 5 && dice.all { it == dice[0] } && dice[0] in 1..6
 
     /**
-     * Score [dice] in [category]. With [joker] set (a Yahtzee played under the joker rule), full house and
+     * Score [dice] in [category]. With [joker] set (a five of a kind played under the joker rule), full house and
      * the straights score their full value even though the dice do not form them.
      */
     fun score(category: Category, dice: List<Int>, joker: Boolean = false): Int {
@@ -34,7 +34,7 @@ object Scoring {
                 if (joker || (counts.any { it == 3 } && counts.any { it == 2 })) FULL_HOUSE else 0
             Category.SMALL_STRAIGHT -> if (joker || hasRun(counts, 4)) SMALL_STRAIGHT else 0
             Category.LARGE_STRAIGHT -> if (joker || hasRun(counts, 5)) LARGE_STRAIGHT else 0
-            Category.YAHTZEE -> if (isYahtzee(dice)) YAHTZEE else 0
+            Category.FIVE_KIND -> if (isFiveOfAKind(dice)) FIVE_KIND else 0
             Category.CHANCE -> sum
         }
     }

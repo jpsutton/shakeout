@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 /**
  * Immutable state of one game. [scores] holds one map per column; a category absent from it is open.
- * [bonusPoints] is the total of Yahtzee bonus chips, already multiplied by the column they were played in.
+ * [bonusPoints] is the total of five-of-a-kind bonus chips. It is flat: the column multipliers do not apply to it.
  * [dice] is five zeros until the first roll of a turn.
  */
 data class GameState(
@@ -50,10 +50,10 @@ object Game {
             Category.entries.filter { it !in state.scores[col] }.map { Placement(col, it) }
         }
 
-    /** The joker rule applies: a Yahtzee rolled after every Yahtzee box has been filled. */
+    /** The joker rule applies: a five of a kind rolled after every five-of-a-kind box has been filled. */
     fun isJoker(state: GameState): Boolean =
-        state.hasRolled && Scoring.isYahtzee(state.dice) &&
-            state.scores.all { Category.YAHTZEE in it }
+        state.hasRolled && Scoring.isFiveOfAKind(state.dice) &&
+            state.scores.all { Category.FIVE_KIND in it }
 
     /** Boxes the current dice may be scored in. Empty before the first roll. */
     fun legalPlacements(state: GameState): List<Placement> {
@@ -70,13 +70,13 @@ object Game {
     fun scoreFor(state: GameState, p: Placement): Int =
         Scoring.score(p.category, state.dice, joker = isJoker(state))
 
-    /** Whether scoring the current dice at [p] also earns the Yahtzee bonus. */
+    /** Whether scoring the current dice at [p] also earns the five-of-a-kind bonus. */
     fun earnsBonus(state: GameState, p: Placement): Boolean {
-        if (!state.hasRolled || !Scoring.isYahtzee(state.dice)) return false
+        if (!state.hasRolled || !Scoring.isFiveOfAKind(state.dice)) return false
         return when (state.mode) {
-            Mode.STANDARD -> state.scores[0][Category.YAHTZEE] == Scoring.YAHTZEE
-            // All three Yahtzee boxes hold 50, and the placement scores something (docs/RULES.md).
-            Mode.TRIPLE -> state.scores.all { it[Category.YAHTZEE] == Scoring.YAHTZEE } &&
+            Mode.STANDARD -> state.scores[0][Category.FIVE_KIND] == Scoring.FIVE_KIND
+            // All three five-of-a-kind boxes hold 50, and the placement scores something (docs/RULES.md).
+            Mode.TRIPLE -> state.scores.all { it[Category.FIVE_KIND] == Scoring.FIVE_KIND } &&
                 scoreFor(state, p) > 0
         }
     }
@@ -85,7 +85,7 @@ object Game {
     fun place(state: GameState, p: Placement): GameState {
         if (p !in legalPlacements(state)) return state
         val points = scoreFor(state, p)
-        val bonus = if (earnsBonus(state, p)) Scoring.YAHTZEE_BONUS * state.mode.multiplier(p.column) else 0
+        val bonus = if (earnsBonus(state, p)) Scoring.FIVE_KIND_BONUS else 0
         val scores = state.scores.mapIndexed { col, m -> if (col == p.column) m + (p.category to points) else m }
         return GameState(
             mode = state.mode,
@@ -100,7 +100,7 @@ object Game {
     fun upperBonus(state: GameState, column: Int): Int =
         if (upperSum(state, column) >= Scoring.UPPER_BONUS_THRESHOLD) Scoring.UPPER_BONUS else 0
 
-    /** One column's total, upper bonus included, before its multiplier and without Yahtzee bonuses. */
+    /** One column's total, upper bonus included, before its multiplier and without five-of-a-kind bonuses. */
     fun columnTotal(state: GameState, column: Int): Int =
         state.scores[column].values.sum() + upperBonus(state, column)
 
