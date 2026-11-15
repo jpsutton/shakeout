@@ -29,5 +29,5 @@ val Mode.title: String
 val Mode.blurb: String
     get() = when (this) {
         Mode.STANDARD -> "One scorecard, 13 turns."
-        Mode.TRIPLE -> "Three scorecards worth x1, x2 and x3, 39 turns."
+        Mode.TRIPLE -> "Three scorecards, 39 turns."
     }
