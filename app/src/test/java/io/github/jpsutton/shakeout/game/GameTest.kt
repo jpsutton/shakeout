@@ -129,17 +129,37 @@ class GameTest {
     }
 
     @Test fun tripleJokerNeedsAllThreeFiveKindBoxesFilled() {
-        val open = setOf(CHANCE, SIXES)
+        val open = setOf(CHANCE, FULL_HOUSE)
         val dice = List(5) { 6 }
         val two = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open + FIVE_KIND, 0))
         assertFalse(Game.isJoker(two))
         assertEquals(7, Game.legalPlacements(two).size)
         val three = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open, 50))
         assertTrue(Game.isJoker(three))
-        assertEquals(
-            setOf(Placement(0, SIXES), Placement(1, SIXES), Placement(2, SIXES)),
-            Game.legalPlacements(three).toSet(),
-        )
+    }
+
+    @Test fun tripleJokerWaitsForTheMatchingUpperBoxInEveryColumn() {
+        val dice = List(5) { 6 }
+        val full = allBut(setOf(CHANCE), 50)
+        val sixesOpen = allBut(setOf(CHANCE, SIXES, FULL_HOUSE), 50)
+        val g = state(Mode.TRIPLE, dice, full, full, sixesOpen)
+        assertFalse(Game.isJoker(g))
+        // Placed like any other roll: every open box is allowed, scored as rolled.
+        assertEquals(5, Game.legalPlacements(g).size)
+        assertEquals(0, Game.scoreFor(g, Placement(2, FULL_HOUSE)))
+        assertEquals(30, Game.scoreFor(g, Placement(2, SIXES)))
+    }
+
+    @Test fun tripleBonusStillAppliesBeforeTheJokerDoes() {
+        val dice = List(5) { 6 }
+        val full = allBut(setOf(CHANCE), 50)
+        val sixesOpen = allBut(setOf(CHANCE, SIXES), 50)
+        val g = state(Mode.TRIPLE, dice, full, full, sixesOpen)
+        assertFalse(Game.isJoker(g))
+        val placed = Game.place(g, Placement(0, CHANCE))
+        assertEquals(30, placed.scores[0][CHANCE])
+        assertEquals("bonus x1 for a roll placed in column 1", 100, placed.bonusPoints)
+        assertEquals(300, Game.place(g, Placement(2, SIXES)).bonusPoints)
     }
 
     @Test fun tripleJokerMovesToLowerBoxesWhenFaceIsFilledEverywhere() {
@@ -149,18 +169,18 @@ class GameTest {
         assertTrue(Game.legalPlacements(g).none { it.category.isUpper })
     }
 
-    @Test fun tripleBonusIsFlatWhateverTheColumn() {
+    @Test fun tripleBonusIsMultipliedByColumn() {
         val open = setOf(CHANCE, SIXES)
         val dice = List(5) { 6 }
         val g = state(Mode.TRIPLE, dice, allBut(open, 50), allBut(open, 50), allBut(open, 50))
         for (column in 0..2) {
             val placed = Game.place(g, Placement(column, SIXES))
-            assertEquals(100, placed.bonusPoints)
+            assertEquals(100 * (column + 1), placed.bonusPoints)
             assertEquals(30, placed.scores[column][SIXES])
         }
-        // Each column already holds its 50; columns are multiplied, the bonus is added afterwards.
+        // Each column already holds its 50; 30 more in column 3 and a 300 bonus.
         val total = Game.total(Game.place(g, Placement(2, SIXES)))
-        assertEquals(50 * 1 + 50 * 2 + (50 + 30) * 3 + 100, total)
+        assertEquals(50 * 1 + 50 * 2 + (50 + 30) * 3 + 300, total)
     }
 
     @Test fun tripleBonusNeedsAllThreeFiveKindBoxesAtFifty() {
