@@ -53,7 +53,8 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
         DiceRow(
             dice = state.dice,
             held = state.held,
-            canHold = state.hasRolled && state.rollsLeft > 0 && !state.isOver,
+            rolling = vm.rolling,
+            canHold = state.hasRolled && state.rollsLeft > 0 && !state.isOver && vm.rolling.isEmpty(),
             onToggle = vm::toggleHold,
             modifier = Modifier.padding(top = 10.dp),
         )
@@ -61,7 +62,7 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = vm::roll,
-                enabled = state.rollsLeft > 0 && !state.isOver,
+                enabled = state.rollsLeft > 0 && !state.isOver && vm.rolling.isEmpty(),
                 modifier = Modifier.weight(1f).heightIn(min = 52.dp),
             ) {
                 Text(
@@ -85,7 +86,7 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
         }
 
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            ScoreCard(state, selected, vm::select)
+            ScoreCard(state, selected, vm::select, enabled = vm.rolling.isEmpty())
         }
     }
 

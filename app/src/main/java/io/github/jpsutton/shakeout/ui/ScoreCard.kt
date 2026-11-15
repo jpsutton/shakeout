@@ -40,8 +40,10 @@ fun ScoreCard(
     selected: Placement?,
     onSelect: (Placement) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
-    val legal = Game.legalPlacements(state).toSet()
+    // While the dice tumble there is nothing to score yet: no previews, nothing to tap.
+    val legal = if (enabled) Game.legalPlacements(state).toSet() else emptySet()
     val columns = state.mode.columns
     Column(modifier) {
         if (state.mode == Mode.TRIPLE) {
