@@ -9,11 +9,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
@@ -54,7 +55,10 @@ private val Pips = mapOf(
     6 to listOf(0 to 0, 2 to 0, 0 to 1, 2 to 1, 0 to 2, 2 to 2),
 )
 
-/** The five dice. Those in [rolling] tumble; the rest, held ones included, stay still. */
+/**
+ * The five dice, each [dieSize] square, spread across the width. Those in [rolling] tumble; the rest, held ones
+ * included, stay still. A held die lifts 10 dp, which the row reserves as top padding.
+ */
 @Composable
 fun DiceRow(
     dice: List<Int>,
@@ -62,17 +66,18 @@ fun DiceRow(
     rolling: Set<Int>,
     canHold: Boolean,
     onToggle: (Int) -> Unit,
+    dieSize: Dp,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
         dice.forEachIndexed { i, value ->
-            Die(value, i in held, canHold, i in rolling) { onToggle(i) }
+            Die(value, i in held, canHold, i in rolling, dieSize) { onToggle(i) }
         }
     }
 }
 
 @Composable
-private fun RowScope.Die(value: Int, held: Boolean, enabled: Boolean, rolling: Boolean, onClick: () -> Unit) {
+private fun Die(value: Int, held: Boolean, enabled: Boolean, rolling: Boolean, dieSize: Dp, onClick: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(14.dp)
 
@@ -99,8 +104,7 @@ private fun RowScope.Die(value: Int, held: Boolean, enabled: Boolean, rolling: B
 
     Box(
         Modifier
-            .weight(1f)
-            .aspectRatio(1f)
+            .size(dieSize)
             .offset(y = if (held) (-10).dp else 0.dp)
             .graphicsLayer {
                 rotationZ = spin.value
@@ -121,7 +125,7 @@ private fun RowScope.Die(value: Int, held: Boolean, enabled: Boolean, rolling: B
             },
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.fillMaxWidth().aspectRatio(1f)) {
+        Canvas(Modifier.fillMaxSize()) {
             drawRect(if (shown == 0) Color(0xFFB8C4BC) else Color(0xFFFDFDF8))
             val pips = Pips[shown].orEmpty()
             val cell = size.width / 4f
