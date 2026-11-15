@@ -26,7 +26,9 @@ private val Sections = listOf(
         "straights score full value), else any open upper box.",
     "Triple mode" to "Three cards, scored x1, x2 and x3, and you pick any open box on any card each turn. Each card " +
         "has its own 63 point upper bonus. The bonus for repeat fives of a kind needs all three five of a kind boxes " +
-        "at 50 and is a flat 100. The joker rule applies once all three are filled.",
+        "at 50, and is worth 100 times the card you score in. The joker rule only starts once all three five of a " +
+        "kind boxes are filled and the matching upper box is filled on every card; until then a repeat five of a " +
+        "kind is placed like any other roll. Once it applies, it can only go in a lower box.",
 )
 
 @Composable

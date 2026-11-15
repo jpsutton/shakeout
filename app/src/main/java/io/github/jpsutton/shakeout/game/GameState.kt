@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 /**
  * Immutable state of one game. [scores] holds one map per column; a category absent from it is open.
- * [bonusPoints] is the total of five-of-a-kind bonus chips. It is flat: the column multipliers do not apply to it.
+ * [bonusPoints] is the total of five-of-a-kind bonus chips. Each bonus is worth 100 times the multiplier of the column it was placed in.
  * [dice] is five zeros until the first roll of a turn.
  */
 data class GameState(
@@ -50,10 +50,15 @@ object Game {
             Category.entries.filter { it !in state.scores[col] }.map { Placement(col, it) }
         }
 
-    /** The joker rule applies: a five of a kind rolled after every five-of-a-kind box has been filled. */
-    fun isJoker(state: GameState): Boolean =
-        state.hasRolled && Scoring.isFiveOfAKind(state.dice) &&
-            state.scores.all { Category.FIVE_KIND in it }
+    /**
+     * The joker rule applies: a five of a kind rolled after every five-of-a-kind box has been filled. In Triple
+     * mode it also needs the matching upper box filled in every column; until then the roll is placed like any other.
+     */
+    fun isJoker(state: GameState): Boolean {
+        if (!state.hasRolled || !Scoring.isFiveOfAKind(state.dice)) return false
+        if (!state.scores.all { Category.FIVE_KIND in it }) return false
+        return state.mode == Mode.STANDARD || Category.upperFor(state.dice[0]).let { upper -> state.scores.all { upper in it } }
+    }
 
     /** Boxes the current dice may be scored in. Empty before the first roll. */
     fun legalPlacements(state: GameState): List<Placement> {
@@ -85,7 +90,7 @@ object Game {
     fun place(state: GameState, p: Placement): GameState {
         if (p !in legalPlacements(state)) return state
         val points = scoreFor(state, p)
-        val bonus = if (earnsBonus(state, p)) Scoring.FIVE_KIND_BONUS else 0
+        val bonus = if (earnsBonus(state, p)) Scoring.FIVE_KIND_BONUS * state.mode.multiplier(p.column) else 0
         val scores = state.scores.mapIndexed { col, m -> if (col == p.column) m + (p.category to points) else m }
         return GameState(
             mode = state.mode,
