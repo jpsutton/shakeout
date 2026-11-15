@@ -87,4 +87,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
             saved = next
         }
     }
+
+    /** Throw away the unfinished game. Only from the menu, where no game is open. */
+    fun abandonSaved() {
+        if (game != null) return
+        store.saveGame(null)
+        saved = null
+    }
 }
