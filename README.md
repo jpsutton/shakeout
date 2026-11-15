@@ -14,10 +14,23 @@ access.
 
 ## Install
 
-Add the F-Droid repository to F-Droid, Droid-ify or Neo Store:
-`https://jpsutton.github.io/shakeout/fdroid/repo` (the fingerprint is on
-`https://jpsutton.github.io/shakeout/fdroid/`), or take the APK from the
-[releases](https://github.com/jpsutton/shakeout/releases).
+Shakeout runs on Android 8.0 or newer. The easiest way to install and update it is Shakeout's F-Droid repository,
+which works in F-Droid, Droid-ify and Neo Store:
+
+1. On the phone, open [jpsutton.github.io/shakeout/fdroid](https://jpsutton.github.io/shakeout/fdroid/) and tap
+   **Add to F-Droid**.
+2. Install **Shakeout** from that repository. New releases then show up as regular app updates.
+
+To add the repository by hand, use the address `https://jpsutton.github.io/shakeout/fdroid/repo` and check that its
+fingerprint is:
+
+```
+ED8C395DCEA3488FCC340BC00F4DF494C35FDFD8EDCAC94F4A63C41D23FAF44E
+```
+
+You can also download `shakeout-<version>.apk` from the
+[Releases page](https://github.com/jpsutton/shakeout/releases/latest) and install it directly. Android asks you to
+allow installs from your browser the first time.
 
 ## Build
 
