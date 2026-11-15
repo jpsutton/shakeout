@@ -30,11 +30,17 @@ data class GameState(
 /** Game rules over a [GameState]: rolling, legal placements, scoring and totals. */
 object Game {
     fun roll(state: GameState, random: Random = Random.Default): GameState {
-        if (state.rollsLeft == 0 || state.isOver) return state
-        val dice = state.dice.mapIndexed { i, d ->
-            if (i in state.held && state.hasRolled) d else random.nextInt(1, 7)
-        }
+        val toRoll = diceToRoll(state)
+        if (toRoll.isEmpty()) return state
+        val dice = state.dice.mapIndexed { i, d -> if (i in toRoll) random.nextInt(1, 7) else d }
         return state.copy(dice = dice, rollsLeft = state.rollsLeft - 1)
+    }
+
+    /** Indices of the dice a roll would change: all five on the first roll, else those not held. None if no roll is left. */
+    fun diceToRoll(state: GameState): Set<Int> = when {
+        state.rollsLeft == 0 || state.isOver -> emptySet()
+        !state.hasRolled -> (0 until GameState.DICE).toSet()
+        else -> (0 until GameState.DICE).filter { it !in state.held }.toSet()
     }
 
     /** Toggle holding die [index]; only between rolls of a turn. */
