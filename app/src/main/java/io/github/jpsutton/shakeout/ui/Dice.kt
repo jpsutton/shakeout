@@ -2,12 +2,13 @@ package io.github.jpsutton.shakeout.ui
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,14 +25,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
@@ -55,9 +63,60 @@ private val Pips = mapOf(
     6 to listOf(0 to 0, 2 to 0, 0 to 1, 2 to 1, 0 to 2, 2 to 2),
 )
 
+/** How far a held die rises, and so the room the row keeps above the dice. */
+private val HeldLift = 8.dp
+
+/** Corner radius of a die, as a share of its width. */
+private const val CORNER_SHARE = 0.24f
+
+/**
+ * Draws a die filling this scope: an ivory face showing [value] on a darker bottom edge [edge] tall, or an empty
+ * green slot when [value] is 0 (not rolled yet). [ring] draws the brass ring of a held die.
+ */
+fun DrawScope.drawDie(value: Int, edge: Float, ring: Float = 0f) {
+    val corner = CornerRadius(size.width * CORNER_SHARE)
+    if (value == 0) {
+        drawRoundRect(Felt.Raised, cornerRadius = corner)
+        val line = 1.5.dp.toPx()
+        drawRoundRect(
+            Color(0x1FFFFFFF),
+            topLeft = Offset(line / 2, line / 2),
+            size = Size(size.width - line, size.height - line),
+            cornerRadius = corner,
+            style = Stroke(line),
+        )
+        return
+    }
+    val faceHeight = size.height - edge
+    if (edge > 0f) drawRoundRect(Felt.DieEdge, cornerRadius = corner)
+    drawRoundRect(Felt.Ivory, size = Size(size.width, faceHeight), cornerRadius = corner)
+    val cellX = size.width / 4f
+    val cellY = faceHeight / 4f
+    val radius = size.width * 0.085f
+    for ((cx, cy) in Pips[value].orEmpty()) {
+        drawCircle(Felt.Pip, radius, Offset(cellX * (cx + 1), cellY * (cy + 1)))
+    }
+    if (ring > 0f) {
+        drawRoundRect(
+            Felt.Brass,
+            topLeft = Offset(ring / 2, ring / 2),
+            size = Size(size.width - ring, size.height - ring),
+            cornerRadius = corner,
+            style = Stroke(ring),
+        )
+    }
+}
+
+/** A die face with no behaviour, for decoration and the upper rows of the scorecard. */
+@Composable
+fun DieFace(value: Int, size: Dp, modifier: Modifier = Modifier, edge: Dp = 0.dp) {
+    Canvas(modifier.size(size)) { drawDie(value, edge.toPx()) }
+}
+
 /**
  * The five dice, each [dieSize] square, spread across the width. Those in [rolling] tumble; the rest, held ones
- * included, stay still. A held die lifts 10 dp, which the row reserves as top padding.
+ * included, stay still. A held die rises [HeldLift], wears a brass ring and, with [showHeldLabel], a "HELD" label
+ * below it.
  */
 @Composable
 fun DiceRow(
@@ -68,19 +127,25 @@ fun DiceRow(
     onToggle: (Int) -> Unit,
     dieSize: Dp,
     modifier: Modifier = Modifier,
+    showHeldLabel: Boolean = true,
 ) {
-    Row(modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(modifier.fillMaxWidth().padding(top = HeldLift), horizontalArrangement = Arrangement.SpaceBetween) {
         dice.forEachIndexed { i, value ->
-            Die(value, i in held, canHold, i in rolling, dieSize) { onToggle(i) }
+            Die(value, i in held, canHold, i in rolling, dieSize, showHeldLabel) { onToggle(i) }
         }
     }
 }
 
 @Composable
-private fun Die(value: Int, held: Boolean, enabled: Boolean, rolling: Boolean, dieSize: Dp, onClick: () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(14.dp)
-
+private fun Die(
+    value: Int,
+    held: Boolean,
+    enabled: Boolean,
+    rolling: Boolean,
+    dieSize: Dp,
+    showHeldLabel: Boolean,
+    onClick: () -> Unit,
+) {
     // While rolling, the die flashes random faces and spins once; the real value shows when it stops.
     var flashed by remember { mutableIntStateOf(value) }
     val spin = remember { Animatable(0f) }
@@ -101,45 +166,43 @@ private fun Die(value: Int, held: Boolean, enabled: Boolean, rolling: Boolean, d
         }
     }
     val shown = if (rolling) flashed else value
+    val lift by animateDpAsState(if (held) -HeldLift else 0.dp, tween(150), label = "lift")
 
-    Box(
-        Modifier
-            .size(dieSize)
-            .offset(y = if (held) (-10).dp else 0.dp)
-            .graphicsLayer {
-                rotationZ = spin.value
-                val scale = if (rolling) 1.08f else 1f
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(shape)
-            .border(if (held) 4.dp else 1.dp, if (held) scheme.primary else scheme.outline, shape)
-            .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
-            .semantics {
-                contentDescription = when {
-                    rolling -> "Die, rolling"
-                    value == 0 -> "Die, not rolled"
-                    else -> "Die showing $value"
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            Modifier
+                .size(dieSize)
+                .offset { IntOffset(0, lift.roundToPx()) }
+                .graphicsLayer {
+                    rotationZ = spin.value
+                    val scale = if (rolling) 1.08f else 1f
+                    scaleX = scale
+                    scaleY = scale
                 }
-                stateDescription = if (held) "Held" else "Not held"
-            },
-        contentAlignment = Alignment.Center,
-    ) {
-        Canvas(Modifier.fillMaxSize()) {
-            drawRect(if (shown == 0) Color(0xFFB8C4BC) else Color(0xFFFDFDF8))
-            val pips = Pips[shown].orEmpty()
-            val cell = size.width / 4f
-            val radius = size.width * 0.085f
-            for ((cx, cy) in pips) {
-                drawCircle(Color(0xFF1A1A1A), radius, Offset(cell * (cx + 1), cell * (cy + 1)))
+                .clip(RoundedCornerShape(dieSize * CORNER_SHARE))
+                .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
+                .semantics {
+                    contentDescription = when {
+                        rolling -> "Die, rolling"
+                        value == 0 -> "Die, not rolled"
+                        else -> "Die showing $value"
+                    }
+                    stateDescription = if (held) "Held" else "Not held"
+                },
+        ) {
+            Canvas(Modifier.fillMaxSize()) {
+                drawDie(shown, edge = 3.dp.toPx(), ring = if (held && shown != 0) 3.dp.toPx() else 0f)
             }
         }
-        if (held) {
+        if (showHeldLabel) {
             Text(
                 "HELD",
-                Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp),
-                color = scheme.primary,
+                Modifier.padding(top = 4.dp).alpha(if (held) 1f else 0f).clearAndSetSemantics {},
+                color = Felt.Brass,
                 fontSize = 10.sp,
+                lineHeight = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.2.sp,
             )
         }
     }
