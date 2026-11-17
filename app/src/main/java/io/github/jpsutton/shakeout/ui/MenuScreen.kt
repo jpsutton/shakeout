@@ -1,23 +1,29 @@
 package io.github.jpsutton.shakeout.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -31,48 +37,109 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jpsutton.shakeout.game.Category
 import io.github.jpsutton.shakeout.game.Game
 import io.github.jpsutton.shakeout.game.GameState
 import io.github.jpsutton.shakeout.game.Mode
+
+private val CardShape = RoundedCornerShape(20.dp)
+private val ButtonShape = RoundedCornerShape(14.dp)
 
 @Composable
 fun MenuScreen(vm: GameViewModel, onRules: () -> Unit) {
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("Shakeout", style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
-        Text("Roll five dice, fill the card. Pick a mode to start.", style = MaterialTheme.typography.bodyLarge)
+        Hero()
 
         vm.saved?.let { saved -> ResumeTile(saved, onResume = vm::resume, onAbandon = vm::abandonSaved) }
 
-        Mode.entries.forEach { mode ->
-            Card(Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                        Column(Modifier.weight(1f).padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(mode.title, style = MaterialTheme.typography.titleLarge)
-                            Text(mode.blurb, style = MaterialTheme.typography.bodyMedium)
-                        }
-                        val best = vm.bests[mode] ?: 0
-                        if (best > 0) BestScore(best)
-                    }
-                    OutlinedButton(
-                        onClick = { vm.start(mode) },
-                        Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                    ) { Text(if (vm.saved?.mode == mode) "New ${mode.title} game" else "Play ${mode.title}") }
+        SectionLabel("New game", Modifier.padding(top = 4.dp, start = 4.dp))
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Mode.entries.forEach { mode ->
+                ModeCard(mode, vm.bests[mode] ?: 0, resumable = vm.saved?.mode == mode, Modifier.weight(1f).fillMaxHeight()) {
+                    vm.start(mode)
                 }
             }
         }
 
-        TextButton(onClick = onRules) { Text("How scoring works") }
+        TextButton(onClick = onRules, Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text("How scoring works", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+/** Three tumbled dice over the name. */
+@Composable
+private fun Hero() {
+    Column(Modifier.padding(top = 12.dp, start = 4.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Row(
+            Modifier.height(76.dp).clearAndSetSemantics {},
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            DieFace(5, 60.dp, Modifier.offset(y = (-4).dp).rotate(-12f), edge = 4.dp)
+            DieFace(3, 60.dp, Modifier.offset(y = 4.dp).rotate(8f), edge = 4.dp)
+            DieFace(6, 60.dp, Modifier.offset(y = (-12).dp).rotate(-4f), edge = 4.dp)
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+                "Shakeout",
+                fontSize = 52.sp, lineHeight = 54.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1).sp,
+                modifier = Modifier.semantics { heading() },
+            )
+            Text("Five dice. Three rolls. Thirteen boxes.", color = Felt.Muted, fontSize = 16.sp)
+        }
+    }
+}
+
+@Composable
+private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text.uppercase(), modifier, color = Felt.Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+        letterSpacing = 1.sp,
+    )
+}
+
+@Composable
+private fun ModeCard(mode: Mode, best: Int, resumable: Boolean, modifier: Modifier, onPlay: () -> Unit) {
+    Column(
+        modifier.clip(CardShape).background(Felt.Panel).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(mode.title, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.semantics { heading() })
+        Text(mode.blurb, color = Felt.Muted, fontSize = 14.sp, lineHeight = 19.sp)
+        Spacer(Modifier.weight(1f))
+        if (best > 0) {
+            Column(Modifier.semantics(mergeDescendants = true) { contentDescription = "Best score: $best" }) {
+                SectionLabel("Best", Modifier.clearAndSetSemantics {})
+                Text(
+                    "%,d".format(best), color = Felt.Brass, fontSize = 30.sp, lineHeight = 34.sp,
+                    fontWeight = FontWeight.ExtraBold, modifier = Modifier.clearAndSetSemantics {},
+                )
+            }
+        }
+        Button(
+            onClick = onPlay,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            shape = ButtonShape,
+            colors = ButtonDefaults.buttonColors(containerColor = Felt.Raised, contentColor = Felt.Text),
+        ) {
+            Text(if (resumable) "New game" else "Play", fontWeight = FontWeight.Bold, maxLines = 1)
+        }
     }
 }
 
@@ -92,7 +159,8 @@ private fun ResumeTile(saved: GameState, onResume: () -> Unit, onAbandon: () -> 
             swipe.reset()
         }
     }
-    val summary = "${saved.mode.title}, turn ${saved.turnsPlayed + 1}, score ${Game.total(saved)}"
+    val total = Game.total(saved)
+    val summary = "${saved.mode.title}, turn ${saved.turnsPlayed + 1}, score $total"
 
     SwipeToDismissBox(
         state = swipe,
@@ -105,7 +173,7 @@ private fun ResumeTile(saved: GameState, onResume: () -> Unit, onAbandon: () -> 
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.errorContainer, MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.errorContainer, CardShape)
                         .padding(horizontal = 20.dp),
                     contentAlignment = if (direction == SwipeToDismissBoxValue.StartToEnd) {
                         Alignment.CenterStart
@@ -122,12 +190,45 @@ private fun ResumeTile(saved: GameState, onResume: () -> Unit, onAbandon: () -> 
             }
         },
     ) {
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Game in progress", style = MaterialTheme.typography.titleMedium)
-                Text(summary, style = MaterialTheme.typography.bodyMedium)
-                Button(onClick = onResume, Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Resume") }
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .clip(CardShape)
+                .background(Felt.Panel)
+                .border(1.5.dp, Felt.Brass, CardShape)
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Row(
+                Modifier.fillMaxWidth().semantics(mergeDescendants = true) { contentDescription = "Game in progress: $summary" },
+                verticalAlignment = Alignment.Top,
+            ) {
+                Column(Modifier.weight(1f).clearAndSetSemantics {}, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SectionLabel("Game in progress")
+                    Text(
+                        "${saved.mode.title} · turn ${saved.turnsPlayed + 1}",
+                        fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                    )
+                }
+                Column(Modifier.clearAndSetSemantics {}, horizontalAlignment = Alignment.End) {
+                    Text(
+                        "%,d".format(total), color = Felt.Brass, fontSize = 30.sp, lineHeight = 32.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                    )
+                    Text("points", color = Felt.Muted, fontSize = 12.sp)
+                }
             }
+            TurnProgress(saved)
+            Button(
+                onClick = onResume,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                shape = ButtonShape,
+            ) { Text("Resume", fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            Text(
+                "Swipe the card sideways to abandon",
+                Modifier.fillMaxWidth().clearAndSetSemantics {},
+                color = Felt.Muted, fontSize = 12.sp, textAlign = TextAlign.Center,
+            )
         }
     }
 
@@ -142,22 +243,22 @@ private fun ResumeTile(saved: GameState, onResume: () -> Unit, onAbandon: () -> 
     }
 }
 
-/** The best score of a mode, large, for the upper-right corner of its card. */
+/** One segment per turn of the game, brass for the turns played. */
 @Composable
-private fun BestScore(best: Int) {
-    Column(
-        Modifier.semantics(mergeDescendants = true) { contentDescription = "Best score: $best" },
-        horizontalAlignment = Alignment.End,
+private fun TurnProgress(saved: GameState) {
+    val turns = saved.mode.columns * Category.entries.size
+    Row(
+        Modifier.fillMaxWidth().semantics { contentDescription = "${saved.turnsPlayed} of $turns turns played" },
+        horizontalArrangement = Arrangement.spacedBy(if (turns > 20) 2.dp else 3.dp),
     ) {
-        Text(
-            "BEST",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            "$best",
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 34.sp, fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.primary,
-        )
+        repeat(turns) { i ->
+            Box(
+                Modifier
+                    .weight(1f)
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(if (i < saved.turnsPlayed) Felt.Brass else Felt.Line.copy(alpha = 0.16f)),
+            )
+        }
     }
 }

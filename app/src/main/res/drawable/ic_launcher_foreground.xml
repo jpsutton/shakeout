@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Felt palette: an ivory die showing five in front of a brass die showing
+     three, inside the adaptive icon safe zone. packaging/fdroid/icon.svg draws the same dice. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- A die face showing five, inside the adaptive icon safe zone. -->
-    <path android:fillColor="#FFFFFF"
-        android:pathData="M34,30h40a6,6 0 0 1 6,6v36a6,6 0 0 1 -6,6h-40a6,6 0 0 1 -6,-6v-36a6,6 0 0 1 6,-6z" />
-    <path android:fillColor="#1B5E3B"
-        android:pathData="M40,36m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
-    <path android:fillColor="#1B5E3B"
-        android:pathData="M68,36m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
-    <path android:fillColor="#1B5E3B"
-        android:pathData="M54,54m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
-    <path android:fillColor="#1B5E3B"
-        android:pathData="M40,72m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
-    <path android:fillColor="#1B5E3B"
-        android:pathData="M68,72m-4.5,0a4.5,4.5 0 1,1 9,0a4.5,4.5 0 1,1 -9,0" />
+    <group android:rotation="15" android:pivotX="63" android:pivotY="45">
+        <path android:fillColor="#0A2C20" android:fillAlpha="0.55" android:pathData="M56.68,35h16.64a7.68,7.68 0 0 1 7.68,7.68v16.64a7.68,7.68 0 0 1 -7.68,7.68h-16.64a7.68,7.68 0 0 1 -7.68,-7.68v-16.64a7.68,7.68 0 0 1 7.68,-7.68z" />
+        <path android:fillColor="#B58A2E" android:pathData="M54.68,32h16.64a7.68,7.68 0 0 1 7.68,7.68v16.64a7.68,7.68 0 0 1 -7.68,7.68h-16.64a7.68,7.68 0 0 1 -7.68,-7.68v-16.64a7.68,7.68 0 0 1 7.68,-7.68z" />
+        <path android:fillColor="#E7B54E" android:pathData="M54.68,29h16.64a7.68,7.68 0 0 1 7.68,7.68v16.64a7.68,7.68 0 0 1 -7.68,7.68h-16.64a7.68,7.68 0 0 1 -7.68,-7.68v-16.64a7.68,7.68 0 0 1 7.68,-7.68z" />
+        <path android:fillColor="#241A04" android:pathData="M52.28,37a2.72,2.72 0 1 0 5.44,0a2.72,2.72 0 1 0 -5.44,0zM60.28,45a2.72,2.72 0 1 0 5.44,0a2.72,2.72 0 1 0 -5.44,0zM68.28,53a2.72,2.72 0 1 0 5.44,0a2.72,2.72 0 1 0 -5.44,0z" />
+    </group>
+    <group android:rotation="-10" android:pivotX="47" android:pivotY="58">
+        <path android:fillColor="#0A2C20" android:fillAlpha="0.55" android:pathData="M39.12,45h19.76a9.12,9.12 0 0 1 9.12,9.12v19.76a9.12,9.12 0 0 1 -9.12,9.12h-19.76a9.12,9.12 0 0 1 -9.12,-9.12v-19.76a9.12,9.12 0 0 1 9.12,-9.12z" />
+        <path android:fillColor="#C9C2AE" android:pathData="M37.12,42h19.76a9.12,9.12 0 0 1 9.12,9.12v19.76a9.12,9.12 0 0 1 -9.12,9.12h-19.76a9.12,9.12 0 0 1 -9.12,-9.12v-19.76a9.12,9.12 0 0 1 9.12,-9.12z" />
+        <path android:fillColor="#FBF8F0" android:pathData="M37.12,39h19.76a9.12,9.12 0 0 1 9.12,9.12v19.76a9.12,9.12 0 0 1 -9.12,9.12h-19.76a9.12,9.12 0 0 1 -9.12,-9.12v-19.76a9.12,9.12 0 0 1 9.12,-9.12z" />
+        <path android:fillColor="#1C1C1A" android:pathData="M34.27,48.5a3.23,3.23 0 1 0 6.46,0a3.23,3.23 0 1 0 -6.46,0zM53.27,48.5a3.23,3.23 0 1 0 6.46,0a3.23,3.23 0 1 0 -6.46,0zM43.77,58a3.23,3.23 0 1 0 6.46,0a3.23,3.23 0 1 0 -6.46,0zM34.27,67.5a3.23,3.23 0 1 0 6.46,0a3.23,3.23 0 1 0 -6.46,0zM53.27,67.5a3.23,3.23 0 1 0 6.46,0a3.23,3.23 0 1 0 -6.46,0z" />
+    </group>
 </vector>
