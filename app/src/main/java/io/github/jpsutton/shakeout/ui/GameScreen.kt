@@ -66,6 +66,9 @@ private val TrayShape = RoundedCornerShape(20.dp)
 fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
     val state = vm.game ?: return
     var confirmLeave by rememberSaveable { mutableStateOf(false) }
+    // Lets the player close the game-over dialog and look at the card; the menu button leaves.
+    var overDismissed by rememberSaveable { mutableStateOf(false) }
+    val leave = { if (state.isOver) onMenu() else confirmLeave = true }
     val selected = vm.selected
     val cardEnabled = vm.rolling.isEmpty()
 
@@ -75,7 +78,7 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
             val dieSize = ((controlsWidth - 56.dp) / 5).coerceAtMost(52.dp)
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(Modifier.weight(LANDSCAPE_CONTROLS_SHARE).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TopBar(state, compact = true) { confirmLeave = true }
+                    TopBar(state, compact = true, leave)
                     Spacer(Modifier.weight(1f))
                     Tray(vm, state, dieSize, compact = true)
                     Buttons(vm, state, selected, compact = true)
@@ -92,7 +95,7 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
             // five fit in the tray.
             val dieSize = minOf((maxHeight * 0.085f).coerceIn(40.dp, 58.dp), (maxWidth - 56.dp) / 5)
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                TopBar(state, compact) { confirmLeave = true }
+                TopBar(state, compact, leave)
                 ScoreCard(state, selected, vm::select, Modifier.weight(1f).fillMaxWidth(), enabled = cardEnabled)
                 Tray(vm, state, dieSize, compact)
                 Buttons(vm, state, selected, compact)
@@ -100,7 +103,7 @@ fun GameScreen(vm: GameViewModel, onMenu: () -> Unit) {
         }
     }
 
-    if (state.isOver) FinishedDialog(state, vm.newBest, onMenu)
+    if (state.isOver && !overDismissed) FinishedDialog(state, vm.newBest, { overDismissed = true }, onMenu)
     if (confirmLeave) {
         AlertDialog(
             onDismissRequest = { confirmLeave = false },
@@ -248,6 +251,7 @@ private fun Buttons(vm: GameViewModel, state: GameState, selected: Placement?, c
         ActionButton(
             title = if (points == null) "Score" else "Score ${points * multiplier}",
             subtitle = when {
+                selected == null && !state.hasRolled -> "Roll first!"
                 selected == null -> "Tap a box first"
                 state.mode == Mode.TRIPLE -> "${selected.category.label}, $points × $multiplier"
                 else -> selected.category.label
@@ -295,9 +299,9 @@ private fun ActionButton(
 }
 
 @Composable
-private fun FinishedDialog(state: GameState, newBest: Boolean, onMenu: () -> Unit) {
+private fun FinishedDialog(state: GameState, newBest: Boolean, onDismiss: () -> Unit, onMenu: () -> Unit) {
     AlertDialog(
-        onDismissRequest = onMenu,
+        onDismissRequest = onDismiss,
         title = { Text("Game over") },
         text = {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -312,5 +316,6 @@ private fun FinishedDialog(state: GameState, newBest: Boolean, onMenu: () -> Uni
             }
         },
         confirmButton = { TextButton(onClick = onMenu) { Text("Menu") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("View card") } },
     )
 }
