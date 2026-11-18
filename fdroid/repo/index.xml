@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fdroid>
+	<repo icon="icon.png" name="Shakeout" pubkey="3082051830820300a0030201020209008f0a6fd4c30f3f73300d06092a864886f70d01010c050030393111300f060355040a13086a70737574746f6e312430220603550403131b5368616b656f757420462d44726f6964207265706f7369746f72793020170d3236313131353136333533305a180f32313236313032323136333533305a30393111300f060355040a13086a70737574746f6e312430220603550403131b5368616b656f757420462d44726f6964207265706f7369746f727930820222300d06092a864886f70d01010105000382020f003082020a0282020100ddc655b015763c7cbec105fc8c1efa1195e2628fe137dca48311921d9d733d46ba7a893b58a18b45845a702ac4b92058a4acb003552da48aac3d4f6ae1c712fbef2c8ca6be4d3bf56cdfd3dcb71fa115da4923a3c55069669f6d1fbcae027d12a00048616e6d41fc42e60b790f5f8425a84aaa302d3be296d0e6480c1a21bafe7a489c800cb761a44e5bdb21310ccc0e5dc24e3f7cde157a0db1819c5db748acecf7808bdc75e4ba8370afa53051c2b93f82af9a99da6b9393bbd03661fa0a9692436eea030a18ee045d2f7c74571ad5b56d6ab4d0bad89d77ec42c97141cbdc03d24e59e4fd76b07d7531b3c04059271914a54d3cff156a25215f4c934d2bef6d79fde710f76d8aab2791694798f4b898c6a351539bcc599633ce4326e6a960f4fd082e690a5151bc141303f7970721c9af2c1f9319a0757aa99ee717000ae6dc2d7c52f9281c5fb294d3ac22f50e93d11adfd6f9d265dd1ccc51f610573a9a84d2dac73fc2f7c728507af9475b05a620caaf2a967527cd70b1bd517b59d08bc16f5db3f27d53f98d5b332ba6512f671c1136def48a527d4a29358068c32488dbae1865b81aff58b9fac666d925b8f9abc394c7948592fab9fbd8e9015c0522309c1aab9f0ee5c9185dab0131cc725ff011e566e060405e4779dc611f3c2294924f71c3eb05fc0c1f4083d68e7b8b7b07304dbed2f8594ed5063a9008746ed70203010001a321301f301d0603551d0e04160414f3b6d59e2d83102969639347927994b934adfdd2300d06092a864886f70d01010c0500038202010069b5de3381246c774efad2e96b77cd18c9ebc4296fc5c034c102c8efe3caa28c0c23d77278f7aec42ebfa1794635aeba975b3f0ea36952c017a76174235ff97b08da51989bead45ebe07fd45bbd14098876394fc4d80e16e1d08a640605b1af3e7d4fc8efe6c6b37bfda18ae34f0c96d78eafb954eae3e3e93ca961004a0d18fa39493260d34a3c0d47c972806d20c81d160d142c566ce1f77802d2f87c0fba913d3d2f8efb9b6fc5ccbd304e20e4ee6d5bdd24e78c49c68ef2c3d67a5bca5a364e0c68835ecf4eae62a94be1498abef6da11ec05304eda9e88489c775f06dc991799a270f20cfc24315b2f6f2be1be77d46b1148b256808339769a58b0f6fc862da397cdedfb955b2f47c3781b5ae293b35c4dc58caf6ebd847bbb6ace3cadb916853ebf11cbbff2fcd44718a95af936df5dfc0a3bc79093e616cfff0464c80e22ae6e25dca6bfb33b9e89dd786ab2dcb87e61445c81dcc35c7e374f307795b7324dea97303eda7981356cb625ad07c8a2ce39ec18e88de698d21f668a69f503083fc5df60b051c903202a26a02451a2f60ab7f5ba039de7187d07f4345d7facc8fe1a5217a846be63073fccacc6ba28fd0af69ae3cd863b304ba39b6a9ca3a957dbd593f1ffd636ab4fd6705ff1f1edf047f8a292115f31a13ef2670c6d6e3816571e9ee454eee2708c66037ff49a061f76903e97b93f2326a71a82b405898" timestamp="1794964667" url="https://jpsutton.github.io/shakeout/fdroid/repo" version="20002">
+		<description>Shakeout, a single-player dice game for Android. Built and signed by the release workflow of https://github.com/jpsutton/shakeout.</description>
+	</repo>
+	<application id="io.github.jpsutton.shakeout">
+		<id>io.github.jpsutton.shakeout</id>
+		<added>2026-11-15</added>
+		<lastupdated>2026-11-18</lastupdated>
+		<name>Shakeout</name>
+		<summary>Single-player dice game with a regular and a triple-card mode</summary>
+		<desc>Shakeout is a single-player dice game. Roll five dice up to three times a turn, hold the ones you like,
+and fill in your scorecard: number boxes, kinds, full house, straights, five of a kind and chance.
+
+Pick a mode before you start. Regular mode plays one scorecard over 13 turns. Triple mode plays three
+scorecards at once, worth x1, x2 and x3, over 39 turns.
+
+Your unfinished game is saved, so you can pick it up later, and the app keeps your best score for each mode.
+There are no ads, accounts or network access.
+
+Shakeout is an independent game and is not affiliated with or endorsed by any publisher.</desc>
+		<license>MIT</license>
+		<categories>Games</categories>
+		<category>Games</category>
+		<web>https://github.com/jpsutton/shakeout</web>
+		<source>https://github.com/jpsutton/shakeout</source>
+		<tracker>https://github.com/jpsutton/shakeout/issues</tracker>
+		<changelog>https://github.com/jpsutton/shakeout/releases</changelog>
+		<marketversion></marketversion>
+		<marketvercode>400</marketvercode>
+		<package>
+			<version>0.4.0</version>
+			<versioncode>400</versioncode>
+			<apkname>shakeout-0.4.0.apk</apkname>
+			<hash type="sha256">fe4084a359e2354b9c86164f57665ee9964dd4542b3e5367a4999b41769cc08c</hash>
+			<size>1019482</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>37</targetSdkVersion>
+			<added>2026-11-18</added>
+			<sig>ec74fe8c1851911297de9e1242fdb052</sig>
+			<permissions>io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>arm64-v8a,armeabi-v7a,x86,x86_64</nativecode>
+		</package>
+		<package>
+			<version>0.3.0</version>
+			<versioncode>300</versioncode>
+			<apkname>shakeout-0.3.0.apk</apkname>
+			<hash type="sha256">095ba2d9cdf01bcdc3b03a85082fff24c9c6187fb17c9bd00940fe345030767a</hash>
+			<size>1019482</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>37</targetSdkVersion>
+			<added>2026-11-17</added>
+			<sig>ec74fe8c1851911297de9e1242fdb052</sig>
+			<permissions>io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>arm64-v8a,armeabi-v7a,x86,x86_64</nativecode>
+		</package>
+		<package>
+			<version>0.2.0</version>
+			<versioncode>200</versioncode>
+			<apkname>shakeout-0.2.0.apk</apkname>
+			<hash type="sha256">b2c468c8b3b82639594cc80df7f8deed22cb267c535191741dbf9f5a058a9ccf</hash>
+			<size>1003042</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>37</targetSdkVersion>
+			<added>2026-11-15</added>
+			<sig>ec74fe8c1851911297de9e1242fdb052</sig>
+			<permissions>io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>arm64-v8a,armeabi-v7a,x86,x86_64</nativecode>
+		</package>
+	</application>
+</fdroid>

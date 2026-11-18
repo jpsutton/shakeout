@@ -1,0 +1,150 @@
+{
+  "repo": {
+    "name": {
+      "en-US": "Shakeout"
+    },
+    "description": {
+      "en-US": "Shakeout, a single-player dice game for Android. Built and signed by the release workflow of https://github.com/jpsutton/shakeout."
+    },
+    "icon": {
+      "en-US": {
+        "name": "/icons/icon.png",
+        "sha256": "90e0579f557c47f886fc228f8b99b2bb401bc7f358bc98262e1354297e8f610c",
+        "size": 841
+      }
+    },
+    "address": "https://jpsutton.github.io/shakeout/fdroid/repo",
+    "timestamp": 1794964667000,
+    "categories": {
+      "Games": {
+        "name": {
+          "en-US": "Games"
+        }
+      }
+    }
+  },
+  "packages": {
+    "io.github.jpsutton.shakeout": {
+      "metadata": {
+        "added": 1794765302000,
+        "categories": [
+          "Games"
+        ],
+        "changelog": "https://github.com/jpsutton/shakeout/releases",
+        "issueTracker": "https://github.com/jpsutton/shakeout/issues",
+        "lastUpdated": 1794964664000,
+        "license": "MIT",
+        "sourceCode": "https://github.com/jpsutton/shakeout",
+        "webSite": "https://github.com/jpsutton/shakeout",
+        "name": {
+          "en-US": "Shakeout"
+        },
+        "summary": {
+          "en-US": "Single-player dice game with a regular and a triple-card mode"
+        },
+        "description": {
+          "en-US": "Shakeout is a single-player dice game. Roll five dice up to three times a turn, hold the ones you like,\nand fill in your scorecard: number boxes, kinds, full house, straights, five of a kind and chance.\n\nPick a mode before you start. Regular mode plays one scorecard over 13 turns. Triple mode plays three\nscorecards at once, worth x1, x2 and x3, over 39 turns.\n\nYour unfinished game is saved, so you can pick it up later, and the app keeps your best score for each mode.\nThere are no ads, accounts or network access.\n\nShakeout is an independent game and is not affiliated with or endorsed by any publisher."
+        },
+        "preferredSigner": "85351c056e85d06b84ce7262ccbd11594aedc37d22ab78ad22bc57547eca0dda"
+      },
+      "versions": {
+        "fe4084a359e2354b9c86164f57665ee9964dd4542b3e5367a4999b41769cc08c": {
+          "added": 1794964664000,
+          "file": {
+            "name": "/shakeout-0.4.0.apk",
+            "sha256": "fe4084a359e2354b9c86164f57665ee9964dd4542b3e5367a4999b41769cc08c",
+            "size": 1019482
+          },
+          "manifest": {
+            "nativecode": [
+              "arm64-v8a",
+              "armeabi-v7a",
+              "x86",
+              "x86_64"
+            ],
+            "versionName": "0.4.0",
+            "versionCode": 400,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 37
+            },
+            "signer": {
+              "sha256": [
+                "85351c056e85d06b84ce7262ccbd11594aedc37d22ab78ad22bc57547eca0dda"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "095ba2d9cdf01bcdc3b03a85082fff24c9c6187fb17c9bd00940fe345030767a": {
+          "added": 1794947716000,
+          "file": {
+            "name": "/shakeout-0.3.0.apk",
+            "sha256": "095ba2d9cdf01bcdc3b03a85082fff24c9c6187fb17c9bd00940fe345030767a",
+            "size": 1019482
+          },
+          "manifest": {
+            "nativecode": [
+              "arm64-v8a",
+              "armeabi-v7a",
+              "x86",
+              "x86_64"
+            ],
+            "versionName": "0.3.0",
+            "versionCode": 300,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 37
+            },
+            "signer": {
+              "sha256": [
+                "85351c056e85d06b84ce7262ccbd11594aedc37d22ab78ad22bc57547eca0dda"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "b2c468c8b3b82639594cc80df7f8deed22cb267c535191741dbf9f5a058a9ccf": {
+          "added": 1794772327000,
+          "file": {
+            "name": "/shakeout-0.2.0.apk",
+            "sha256": "b2c468c8b3b82639594cc80df7f8deed22cb267c535191741dbf9f5a058a9ccf",
+            "size": 1003042
+          },
+          "manifest": {
+            "nativecode": [
+              "arm64-v8a",
+              "armeabi-v7a",
+              "x86",
+              "x86_64"
+            ],
+            "versionName": "0.2.0",
+            "versionCode": 200,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 37
+            },
+            "signer": {
+              "sha256": [
+                "85351c056e85d06b84ce7262ccbd11594aedc37d22ab78ad22bc57547eca0dda"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "io.github.jpsutton.shakeout.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
