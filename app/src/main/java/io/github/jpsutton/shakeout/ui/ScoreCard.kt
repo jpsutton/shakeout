@@ -60,6 +60,17 @@ private val TripleLabelWidth = 112.dp
 private val PanelShape = RoundedCornerShape(16.dp)
 
 /**
+ * Translucent overlay that sets the columns of a Triple card apart: strongest on x1, lighter on x2, none on x3.
+ * Standard has no columns to tell apart.
+ */
+private fun columnTint(mode: Mode, column: Int): Color = when {
+    mode != Mode.TRIPLE -> Color.Transparent
+    column == 0 -> Color(0x1FFFFFFF)
+    column == 1 -> Color(0x0FFFFFFF)
+    else -> Color.Transparent
+}
+
+/**
  * Rows in the tallest part of a card. Regular: each half (Upper, Lower) has a header and 7 rows. Triple: the
  * multiplier header, 6 upper rows, the upper bonus, 7 lower rows and the column totals.
  */
@@ -206,18 +217,23 @@ private fun TableCard(
         Row(Modifier.fillMaxWidth().height(m.rowHeight), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(TripleLabelWidth))
             repeat(columns) {
-                Label(
-                    "×${state.mode.multiplier(it)}", Modifier.weight(1f), m.textSize, Felt.Brass, FontWeight.ExtraBold,
-                    align = TextAlign.Center,
-                )
+                Box(
+                    Modifier.weight(1f).fillMaxHeight().background(columnTint(state.mode, it)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Label(
+                        "×${state.mode.multiplier(it)}", Modifier, m.textSize, Felt.Brass, FontWeight.ExtraBold,
+                        align = TextAlign.Center,
+                    )
+                }
             }
         }
         Category.upper.forEach { TableRow(state, it, legal, selected, onSelect, m) }
-        SummaryRow("Upper bonus", columns, m) { col ->
+        SummaryRow("Upper bonus", state.mode, m) { col ->
             if (Game.upperBonus(state, col) > 0) "35" else "${Game.upperSum(state, col)}/${Scoring.UPPER_BONUS_THRESHOLD}"
         }
         Category.lower.forEach { TableRow(state, it, legal, selected, onSelect, m) }
-        SummaryRow("Column total", columns, m) { col -> Game.columnTotal(state, col).toString() }
+        SummaryRow("Column total", state.mode, m) { col -> Game.columnTotal(state, col).toString() }
     }
 }
 
@@ -257,6 +273,7 @@ private fun RowScope.TableCell(
         Modifier
             .weight(1f)
             .fillMaxHeight()
+            .background(columnTint(state.mode, p.column))
             .then(if (box.legal) Modifier.clickable(role = Role.Button) { onSelect(p) } else Modifier)
             .semantics { contentDescription = box.description }
             .padding(horizontal = 3.dp, vertical = m.rowHeight * 0.1f),
@@ -266,7 +283,7 @@ private fun RowScope.TableCell(
 }
 
 @Composable
-private fun SummaryRow(label: String, columns: Int, m: Metrics, value: (Int) -> String) {
+private fun SummaryRow(label: String, mode: Mode, m: Metrics, value: (Int) -> String) {
     Row(
         Modifier.fillMaxWidth().height(m.rowHeight).hairline().background(Color(0x1F000000)),
         verticalAlignment = Alignment.CenterVertically,
@@ -274,8 +291,13 @@ private fun SummaryRow(label: String, columns: Int, m: Metrics, value: (Int) -> 
         Box(Modifier.width(TripleLabelWidth).padding(start = 10.dp)) {
             Label(label, Modifier, m.smallSize, Felt.Muted)
         }
-        repeat(columns) { col ->
-            Label(value(col), Modifier.weight(1f), m.smallSize, Felt.Muted, FontWeight.Bold, align = TextAlign.Center)
+        repeat(mode.columns) { col ->
+            Box(
+                Modifier.weight(1f).fillMaxHeight().background(columnTint(mode, col)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Label(value(col), Modifier, m.smallSize, Felt.Muted, FontWeight.Bold, align = TextAlign.Center)
+            }
         }
     }
 }
